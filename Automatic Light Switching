@@ -1,0 +1,71 @@
+#include &lt;wiringPi.h&gt;
+#include &lt;stdio.h&gt;
+
+#define makerobo_VibratePin 0
+#define makerobo_Rpin 1
+#define makerobo_Gpin 2
+
+int clb_tmp = 0;
+
+
+void double_colorLED(int color)
+{
+    pinMode(makerobo_Rpin, OUTPUT);
+    pinMode(makerobo_Gpin, OUTPUT);
+
+    if (0 == color)
+    {
+      digitalWrite(makerobo_Rpin, HIGH);
+      digitalWrite(makerobo_Gpin, LOW);
+    }
+    else if (1 == color)
+    {
+      digitalWrite(makerobo_Rpin, LOW);
+      digitalWrite(makerobo_Gpin, HIGH);
+    }
+    else
+    printf("Makerobo Double color LED Error\n");
+}
+
+void makerobo_Print(int x){
+
+    if (x != clb_tmp)
+    { 
+      if (x == 0)
+      printf("...Makerobo ON\n");
+      if (x == 1)
+      printf("Makerobo OFF..\n");
+      clb_tmp = x;
+    }
+}
+
+int main(void)
+{
+  int clb_status = 0;
+  int clb_tmp = 0;
+  int clb_value = 1;
+
+
+  if(wiringPiSetup() == -1){
+  printf("setup wiringPi failed !");
+  return 1;
+  }
+
+pinMode(makerobo_VibratePin, INPUT);
+
+while(1){
+    clb_value = digitalRead(makerobo_VibratePin);
+    if (clb_tmp != clb_value)
+    {
+      clb_status ++;
+      if (clb_status &gt; 1)
+        {
+          clb_status = 0;
+        }
+      double_colorLED(clb_status);
+      makerobo_Print(clb_status);
+      delay(1000);
+     }
+  }
+  return 0;
+}
